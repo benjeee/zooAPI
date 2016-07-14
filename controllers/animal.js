@@ -18,21 +18,58 @@ var bodyParser = require('body-parser');
  *        type: string
  */
 
+ /**
+  * @swagger
+  * /animal:
+  *   get:
+  *     description: Gets all Animals
+  *     summary: Get all Animals
+  *     tags:
+  *       - Animals
+  *     produces:
+  *       - application/json
+  *     responses:
+  *       200:
+  *         description: Successful
+  *         schema:
+  *           $ref: '#/definitions/Animal'
+  *       404:
+  *         description: Animals not found
+  */
 router.get('/', function(req,res){
 	var database = req.app.get('database');
   var query = 'SELECT * FROM animal';
+
 	database.query(query, function(err, rows, fields){
-		if(!err){
+		if( !err ){
 			console.log(rows);
 			res.status(200).send(rows);
 		}
 		else{
-			console.log('Error');
-			res.status(404).send(rows);
+			console.error('Error');
+			res.status(404).send("Animals not found");
 		}
 	});
 });
 
+/**
+ * @swagger
+ * /animal/all:
+ *   get:
+ *     description: Gets all Animals + Exhibits
+ *     summary: Get all Animals + Exhibits
+ *     tags:
+ *       - Animals
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Successful
+ *         schema:
+ *           $ref: '#/definitions/Animal'
+ *       404:
+ *         description: Animals not found
+ */
 router.get('/all', function(req,res){
 	var database = req.app.get('database');
   	var query =
@@ -56,6 +93,9 @@ router.get('/all', function(req,res){
  * /animal:
  *   post:
  *     description: Creates a new animal
+ *     summary: Post an Animal
+ *     tags:
+ *       - Animals
  *     produces:
  *       - application/json
  *     parameters:
@@ -94,19 +134,15 @@ router.post('/', function(req,res){
   }
   console.log(query);
 	database.query(query, function(err, rows, fields){
-
-    if(!err){
+    if( !err ){
   		console.log(rows);
-  		res.status(201).send(animal);
+  		res.status(201).send(rows);
   	}
   	else{
-      console.log(animal)
-  		console.log('Error');
+  		console.error('Error: Could not insert');
   		res.sendStatus(500);
   	}
   });
-
-
 });
 
 /**
@@ -114,6 +150,9 @@ router.post('/', function(req,res){
  * /animal/{id}:
  *   delete:
  *    description: Deletes a single animal
+ *    summary: Delete an Animal
+ *    tags:
+ *      - Animals
  *    parameters:
  *      - name: id
  *        description: Animal ID
@@ -132,15 +171,15 @@ router.delete('/:id', function(req,res){
 	var query = 'DELETE FROM animal WHERE id = '+id;
 
   database.query(query, function(err, rows, fields){
-	if(!err){
-		console.log(rows);
-		res.sendStatus(200);
-	} else {
-		console.log('Error');
-		console.log(query);
-		res.sendStatus(500);
-	}
-});
+  	if(!err){
+  		console.log(rows);
+  		res.sendStatus(200);
+  	} else {
+  		console.log('Error');
+  		console.log(query);
+  		res.sendStatus(500);
+  	}
+  });
 });
 
 module.exports = router;
