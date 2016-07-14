@@ -1,10 +1,26 @@
 var express = require('express')
   , router = express.Router();
-
+var bodyParser = require('body-parser');
+/**
+ * @swagger
+ * definition:
+ *   Animal:
+ *    properties:
+ *      animal_name:
+ *        type: string
+ *      info_text:
+ *        type: string
+ *      exhibit_id:
+ *        type: string
+ *      picture_link:
+ *        type: string
+ *      audio_link:
+ *        type: string
+ */
 
 router.get('/', function(req,res){
 	var database = req.app.get('database');
-  	var query = 'SELECT * FROM animal';
+  var query = 'SELECT * FROM animal';
 	database.query(query, function(err, rows, fields){
 		if(!err){
 			console.log(rows);
@@ -35,63 +51,96 @@ router.get('/all', function(req,res){
 	});
 });
 
+/**
+ * @swagger
+ * /animal:
+ *   post:
+ *     description: Creates a new animal
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: animal
+ *         description: Animal Object
+ *         in: body
+ *         required: true
+ *         schema:
+ *           $ref: '#/definitions/Animal'
+ *     responses:
+ *       201:
+ *         description: Added animal
+ *         schema:
+ *           $ref: '#/definitions/Animal'
+ *       500:
+ *         description: Server Error
+ */
+router.post('/', function(req,res){
+	var name = req.body.animal_name;
+	var info = req.body.info_text;
+	var exhibit_id = req.body.exhibit_id;
+	var picture_link = req.body.picture_link;
+	var audio_link = req.body.audio_link;
+	var database = req.app.get('database');
+	var query =
+		'INSERT INTO animal '+
+		'(name, info_text, exhibit_id, picture_link, audio_link) VALUES (' +
+		' \''+name+'\', \''+info+'\', '+exhibit_id+
+		', \''+picture_link+'\', \''+audio_link+'\')';
+  var animal = {
+    "animal_name": name,
+    "info_text": info,
+    "exhibit_id": exhibit_id,
+    "picture_link": picture_link,
+    "audio_link": audio_link
+  }
+  console.log(query);
+	database.query(query, function(err, rows, fields){
 
-router.post('/add', function(req,res){
-	var name = req.query.animal_name;
-	var info = req.query.info_text;
-	var exhibit_id = req.query.exhibit_id;
-	var picture_link = req.query.picture_link;
-	var audio_link = req.query.audio_link;
-	if(name == null || info == null || exhibit_id == null
-			|| picture_link == null ||audio_link==null){
-		console.log('Parameter not found');
-		res.sendStatus(400);
-	}
-	else{
-		var database = req.app.get('database');
-		var query =
-			'INSERT INTO animal '+
-			'(name, info_text, exhibit_id, picture_link, audio_link) VALUES (' +
-			' \''+name+'\', \''+info+'\', '+exhibit_id+
-			', \''+picture_link+'\', \''+audio_link+'\')';
-		database.query(query, function(err, rows, fields){
-		if(!err){
-			console.log(rows);
-			res.status(200).send(rows);
-		}
-		else{
-			console.log('Error');
-			res.status(500).send(rows);
-		}
-	});
-	}
+    if(!err){
+  		console.log(rows);
+  		res.status(201).send(animal);
+  	}
+  	else{
+      console.log(animal)
+  		console.log('Error');
+  		res.sendStatus(500);
+  	}
+  });
+
 
 });
 
-router.post('/delete', function(req,res){
-	var id = req.query.animal_id;
-	if(id == null){
-		console.log('Parameter not found');
-		res.sendStatus(400);
-	}
-	else{
-		var database = req.app.get('database');
-		var query =
-			'DELETE FROM animal '+
-			'WHERE id = '+id;
-		database.query(query, function(err, rows, fields){
-		if(!err){
-			console.log(rows);
-			res.status(200).send(rows);
-		}
-		else{
-			console.log('Error');
-			console.log(query);
-			res.status(500).send(rows);
-		}
-	});
-	}
+/**
+ * @swagger
+ * /animal/{id}:
+ *   delete:
+ *    description: Deletes a single animal
+ *    parameters:
+ *      - name: id
+ *        description: Animal ID
+ *        in: path
+ *        required: true
+ *        type: string
+ *    responses:
+ *     200:
+ *      description: Successfully deleted
+ *     500:
+ *      description: Server Error
+ */
+router.delete('/:id', function(req,res){
+	var id = req.path.id;
+	var database = req.app.get('database');
+	var query = 'DELETE FROM animal WHERE id = '+id;
 
+  database.query(query, function(err, rows, fields){
+	if(!err){
+		console.log(rows);
+		res.sendStatus(200);
+	} else {
+		console.log('Error');
+		console.log(query);
+		res.sendStatus(500);
+	}
+});
 });
 
 module.exports = router;
