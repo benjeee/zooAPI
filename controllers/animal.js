@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 var express = require('express')
 var router = express.Router();
 var bodyParser = require('body-parser');
@@ -327,3 +328,6 @@ router.put('/:id', function(req,res){
 });
 
 module.exports = router;
+=======
+// Testing
+>>>>>>> 832959ff574db359a6172f815e5490d9353ba02a
