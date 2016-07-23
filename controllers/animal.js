@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 var express = require('express')
 var router = express.Router();
 var bodyParser = require('body-parser');
@@ -6,8 +5,6 @@ var isvalid = require('isvalid');
 var mysql = require('mysql');
 var animalSchema = require('../models/animalSchema');
 var animalSchemaEdit = require('../models/animalSchemaEdit');
-
-// Ron Basumallik
 
 /**
  * @swagger
@@ -83,7 +80,7 @@ var animalSchemaEdit = require('../models/animalSchemaEdit');
   */
 router.get('/', function(req,res){
 	var database = req.app.get('database'); // Database Global Connection
-  var query = 'SELECT * FROM animal'; // SQL Query 
+  var query = 'SELECT * FROM animal'; // SQL Query
 
 	database.query(query, function(error, result){ // SQL Query Execution
 		if( !error ){
@@ -131,7 +128,7 @@ router.get('/all', function(req,res){
 			res.status(200).send(result); // Status: OK. Return Query
 		}
 		else{
-			console.log("Error: %s", error); // Log Error 
+			console.log("Error: %s", error); // Log Error
 			res.status(400).send("Bad Request"); // Status: Bad Request. Return Error String
 		}
 	});
@@ -163,12 +160,12 @@ router.get('/all', function(req,res){
  */
 router.get('/:id', function(req,res){
   var database = req.app.get('database'); // Database Global Connection
-  var animalId = req.params.id; // Path Parameter 
+  var animalId = req.params.id; // Path Parameter
   var query = 'SELECT * FROM animal WHERE id = ' + database.escape(animalId); // SQL Query with verified user input
 
   database.query(query, function(error, result){ // SQL Query Execution
     if ( !error ){
-      console.log(result); 
+      console.log(result);
       res.status(200).send(result); // Status: OK. Return Query
     } else {
       console.error("Error: %s", error); // Log Error
@@ -255,12 +252,12 @@ router.post('/', function(req,res){
  */
 router.delete('/:id', function(req,res){
   var database = req.app.get('database'); // Database Global Connection
-  var animalId = req.params.id; // Path Parameter 
+  var animalId = req.params.id; // Path Parameter
   var query = 'DELETE FROM animal WHERE id = ' + database.escape(animalId); // SQL Query with verified user input
 
   database.query(query, function(error, result){ // SQL Query Execution
     if ( !error ){
-      console.log(result); 
+      console.log(result);
       res.status(200).send(result); // Status: OK. Return Query
     } else {
       console.error("Error: %s", error); // Log Error
@@ -318,8 +315,8 @@ router.put('/:id', function(req,res){
           console.error("Error: %s", error); // Log Error
           res.status(400).send("Bad Request."); // Status: Bad Request. Return Error String
         } else {
-          console.log(result); 
-          res.status(200).send(result); // Status: OK. Return Query  
+          console.log(result);
+          res.status(200).send(result); // Status: OK. Return Query
         }
       });
     }
@@ -328,6 +325,3 @@ router.put('/:id', function(req,res){
 });
 
 module.exports = router;
-=======
-// Testing
->>>>>>> 832959ff574db359a6172f815e5490d9353ba02a
