@@ -3,9 +3,6 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var isvalid = require('isvalid');
 var mysql = require('mysql');
-var animalSchema = require('../models/animalSchema');
-var animalSchemaEdit = require('../models/animalSchemaEdit');
-
 /**
  * @swagger
  * definition:
@@ -200,11 +197,6 @@ router.get('/:id', function(req,res){
  *         description: Bad Request
  */
 router.post('/', function(req,res){
-  isvalid(req.body, animalSchema, function(error, data){ // Validates input types and model
-    if ( error ){
-      console.error("Error: %s", error); // Erorr in validation
-      res.status(400).send("Bad Request"); // Status: Bad Request. Return Error String
-    } else {
         var name = mysql.escape(data.animal_name); // Escapes all user inputted data
         var info = mysql.escape(data.info_text);
         var exhibit_id = mysql.escape(data.exhibit_id);
@@ -226,8 +218,6 @@ router.post('/', function(req,res){
               res.status(400).send("Bad Request."); // Status: Bad Request. Return Error String
           }
         });
-    }
-  });
 });
 
 /**
@@ -293,11 +283,6 @@ router.delete('/:id', function(req,res){
  *      description: Bad Request
  */
 router.put('/:id', function(req,res){
-  isvalid(req.body, animalSchemaEdit, function(error, data){ // Validates input types and model
-    if ( error ){
-      console.error("Error: %s", error); // Erorr in validation
-      res.status(400).send("Bad Request"); // Status: Bad Request. Return Error String
-    } else {
       var query = 'UPDATE animal SET ';
       var database = req.app.get('database') // Database Global Connection
       var animalId = mysql.escape(req.params.id); // Path Parameter - Escape user inputted values
@@ -319,9 +304,6 @@ router.put('/:id', function(req,res){
           res.status(200).send(result); // Status: OK. Return Query
         }
       });
-    }
-  });
-
 });
 
 module.exports = router;
