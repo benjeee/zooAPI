@@ -7,67 +7,40 @@ var swaggerJSDoc = require('swagger-jsdoc');
 
 var jsonParser = bodyParser.json()
 
-
 /**
  * @swagger
  * definition:
- *   Animal:
+ *   News:
  *    properties:
  *      id:
  *        type: integer
- *      name:
+ *      title:
  *        type: string
- *      info_text:
+ *      text:
  *        type: string
- *      exhibit_id:
- *        type: integer
- *      picture_link:
+ *      image_link:
  *        type: string
- *      audio_link:
- *        type: string
- *      active:
- *        type: integer
- *   AnimalPost:
- *    properties:
- *      name:
- *        type: string
- *      info_text:
- *        type: string
- *      exhibit_id:
- *        type: integer
- *      picture_link:
- *        type: string
- *      audio_link:
- *        type: string
- *      active:
- *        type: integer
- *   All:
+ *   NewsPost:
  *    properties:
  *      id:
  *        type: integer
- *      name:
+ *      title:
  *        type: string
- *      info_text:
+ *      text:
  *        type: string
- *      exhibit_id:
- *        type: integer
- *      picture_link:
- *        type: string
- *      audio_link:
- *        type: string
- *      exhibit_name:
+ *      image_link:
  *        type: string
  */
 
 
  /**
   * @swagger
-  * /animal:
+  * /news:
   *   get:
-  *     description: Gets all Animals
-  *     summary: Get all Animals
+  *     description: Gets all News items
+  *     summary: Get all News items
   *     tags:
-  *       - Animals
+  *       - News
   *     produces:
   *       - application/json
   *     responses:
@@ -76,13 +49,13 @@ var jsonParser = bodyParser.json()
   *         schema:
   *           type: array
   *           items:
-  *             $ref: '#/definitions/Animal'
+  *             $ref: '#/definitions/News'
   *       400:
   *         description: Bad Request
   */
 router.get('/', function(req,res){
 	var database = req.app.get('database'); // Database Global Connection
-  var query = 'SELECT * FROM animal'; // SQL Query
+  var query = 'SELECT * FROM news'; // SQL Query
 
 	database.query(query, function(error, result){ // SQL Query Execution
 		if( !error ){
@@ -98,57 +71,17 @@ router.get('/', function(req,res){
 
 /**
  * @swagger
- * /animal/all:
+ * /news/{id}:
  *   get:
- *     description: Gets all Animals + Exhibits
- *     summary: Get all Animals + Exhibits
+ *     summary: Gets a news item
+ *     description: Get an individual news item from the database
  *     tags:
- *       - Animals
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: Successful
- *         schema:
- *           type: array
- *           items:
- *             $ref: '#/definitions/All'
- *       400:
- *         description: Animals not found
- */
-router.get('/all', function(req,res){
-	var database = req.app.get('database'); // Database Global Connection
-  var query =
-      'SELECT animal.id, animal.name, animal.info_text, animal.picture_link, '+
-      'animal.audio_link, animal.exhibit_id, exhibit.exhibit_name FROM animal '+
-      'INNER JOIN exhibit on animal.exhibit_id = exhibit.id';
-  // ^ SQL Query Returns all Exhibit information in addition to Animal information
-
-	database.query(query, function(err, result){ // SQL Query Execution
-		if( !err ){
-			console.log(result);
-			res.status(200).send(result); // Status: OK. Return Query
-		}
-		else{
-			console.log("Error: %s", error); // Log Error
-			res.status(400).send("Bad Request"); // Status: Bad Request. Return Error String
-		}
-	});
-});
-
-/**
- * @swagger
- * /animal/{id}:
- *   get:
- *     summary: Gets an animal
- *     description: Get an individual animal from the database
- *     tags:
- *       - Animals
+ *       - News
  *     produces:
  *       - application/json
  *     parameters:
  *       - name: id
- *         description: Animal ID
+ *         description: News ID
  *         in: path
  *         required: true
  *         type: integer
@@ -156,14 +89,14 @@ router.get('/all', function(req,res){
  *       200:
  *         description: Successful
  *         schema:
- *           $ref: '#/definitions/Animal'
+ *           $ref: '#/definitions/News'
  *       400:
  *         description: Bad Request
  */
 router.get('/:id', function(req,res){
   var database = req.app.get('database'); // Database Global Connection
-  var animalId = req.params.id; // Path Parameter
-  var query = 'SELECT * FROM animal WHERE id = ' + database.escape(animalId); // SQL Query with verified user input
+  var newsId = req.params.id; // Path Parameter
+  var query = 'SELECT * FROM news WHERE id = ' + database.escape(newsId); // SQL Query with verified user input
 
   database.query(query, function(error, result){ // SQL Query Execution
     if ( !error ){
@@ -178,43 +111,42 @@ router.get('/:id', function(req,res){
 
 /**
  * @swagger
- * /animal:
+ * /news:
  *   post:
- *     description: Creates a new animal
- *     summary: Post an Animal
+ *     description: Creates a new news item
+ *     summary: Post a News item
  *     tags:
- *       - Animals
+ *       - News
  *     produces:
  *       - application/json
  *     parameters:
- *       - name: animal
- *         description: Animal Object
+ *       - name: news
+ *         description: News Object
  *         in: body
  *         required: true
  *         schema:
- *           $ref: '#/definitions/AnimalPost'
+ *           $ref: '#/definitions/NewsPost'
  *     responses:
  *       201:
- *         description: Added animal
+ *         description: Added news item
  *         schema:
- *           $ref: '#/definitions/Animal'
+ *           $ref: '#/definitions/News'
  *       400:
  *         description: Bad Request
  */
 router.post('/', function(req,res){
+				console.log("In News/Post")
 				var data = req.body
-        var name = mysql.escape(data.animal_name); // Escapes all user inputted data
-        var info = mysql.escape(data.info_text);
-        var exhibit_id = mysql.escape(data.exhibit_id);
-        var picture_link = mysql.escape(data.picture_link);
-        var audio_link = mysql.escape(data.audio_link);
+
+        var title = mysql.escape(data.title); // Escapes all user inputted data
+        var text = mysql.escape(data.text);
+        var image_link = mysql.escape(data.image_link);
         var database = req.app.get('database'); // Database Global Connection
         var query =
-          'INSERT INTO animal '+
-          '(name, info_text, exhibit_id, picture_link, audio_link) VALUES (' +
-          ' '+name+', '+info+', '+exhibit_id+
-          ', '+picture_link+', '+audio_link+')'; // SQL Query
-
+          'INSERT INTO news '+
+          '(title, text, image_link) VALUES (' +
+          ' '+title+', '+text+', '+image_link+')'; // SQL Query
+				console.log(query)
         database.query(query, function(error, result){ // SQL Query Execution
           if( !error ) {
             console.log(result);
@@ -228,15 +160,15 @@ router.post('/', function(req,res){
 
 /**
  * @swagger
- * /animal/{id}:
+ * /news/{id}:
  *   delete:
- *    summary: Deletes an animal
- *    description: Delete an individual animal from the database
+ *    summary: Deletes a news item
+ *    description: Delete an individual news item from the database
  *    tags:
- *      - Animals
+ *      - News
  *    parameters:
  *      - name: id
- *        description: Animal ID
+ *        description: News ID
  *        in: path
  *        required: true
  *        type: integer
@@ -248,8 +180,8 @@ router.post('/', function(req,res){
  */
 router.delete('/:id', function(req,res){
   var database = req.app.get('database'); // Database Global Connection
-  var animalId = req.params.id; // Path Parameter
-  var query = 'DELETE FROM animal WHERE id = ' + database.escape(animalId); // SQL Query with verified user input
+  var newsID = req.params.id; // Path Parameter
+  var query = 'DELETE FROM news WHERE id = ' + database.escape(newsID); // SQL Query with verified user input
 
   database.query(query, function(error, result){ // SQL Query Execution
     if ( !error ){
@@ -264,24 +196,24 @@ router.delete('/:id', function(req,res){
 
 /**
  * @swagger
- * /animal/{id}:
+ * /news/{id}:
  *   put:
- *    summary: Updates an animal
- *    description: Update an individual animal from the database
+ *    summary: Updates a news item
+ *    description: Update an individual news item from the database
  *    tags:
- *      - Animals
+ *      - News
  *    parameters:
  *      - name: id
- *        description: Animal ID
+ *        description: News ID
  *        in: path
  *        required: true
  *        type: integer
- *      - name: animal
- *        description: Animal Object. Everything Optional
+ *      - name: news
+ *        description: News Object. Everything Optional
  *        in: body
  *        required: true
  *        schema:
- *          $ref: '#/definitions/AnimalPost'
+ *          $ref: '#/definitions/NewsPost'
  *    responses:
  *     200:
  *      description: Successful
@@ -290,23 +222,22 @@ router.delete('/:id', function(req,res){
  */
 router.put('/:id', function(req,res){
 			var data = req.body
-      var query = 'UPDATE animal SET ';
+      var query = 'UPDATE news SET ';
       var database = req.app.get('database') // Database Global Connection
-      var animalId = mysql.escape(req.params.id); // Path Parameter - Escape user inputted values
+      var newsId = req.params.id; // Path Parameter - Escape user inputted values
 
 			var idx = 0
 			var count = Object.keys(data).length
-			for (var key in data){ // Iterates through updated values
-				var keyValid = (mysql.escape(key)).slice(1,-1); // Validates User Inputted Key
-				var valueValid = mysql.escape(data[key]); // Valides User Inputted Value
+      for (var key in data){ // Iterates through updated values
+        var keyValid = (mysql.escape(key)).slice(1,-1); // Validates User Inputted Key
+        var valueValid = mysql.escape(data[key]); // Valides User Inputted Value
 				query = query + keyValid + "=" + valueValid // Build Query
 				if(idx != count - 1){
-					query = query + ", "; // Build Query
+        	query = query + ", "; // Build Query
 				}
 				idx = idx + 1
-			}
-
-      query = query + ' WHERE id = ' + animalId; // SQL Query
+      }
+      query = query + ' WHERE id = ' + newsId; // SQL Query
 
       database.query(query, function(error, result){ // SQL Query Execution
         if (error) {

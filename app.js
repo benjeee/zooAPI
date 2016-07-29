@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/animal', require('./controllers/animal'));
 app.use('/exhibit', require('./controllers/exhibit'));
+app.use('/news', require('./controllers/news'))
 
 var swaggerDefinition = {
   info: {
@@ -17,7 +18,7 @@ var swaggerDefinition = {
     version: '1.0.0',
     description: 'RESTful API for the Salisbury Zoological Foundation'
   },
-  host: '192.168.1.9:3000',
+  host: '192.168.1.3:3000',
   basePath: '/',
 };
 
